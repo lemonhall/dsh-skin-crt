@@ -72,6 +72,12 @@ tools/capture_facade.cjs     用 Playwright 出 1440x900 预览
 _vendor/                     上游下载归档（不入库）
 ```
 
+## 仓库里的两个版本
+
+本仓库的 `skins/crt-phosphor/` 带可选的可交互 `hooks.mjs`：点任一位小姐姐，她会随机回一句（气泡是 DOM，因此无论文字多长都停在**头顶上方**）。投给创意工坊的版本**不带 hooks** —— 皮肤契约明确把 `facets.client` 保留给内置皮肤，且写明不会成为"仓库外可执行扩展"的入口。
+
+本地要让 hooks 生效，安装目录里需要有 `dsh-market.provenance.json`；它到底是什么、意味着什么，见 `tools/make-local-provenance.mjs` 与 `docs/CRT-TECHNIQUE.md` 的 Lesson 6。
+
 ## 验证
 
 | 门禁 | 结果 |

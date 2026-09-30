@@ -104,6 +104,18 @@ tools/capture_facade.cjs     render the 1440x900 previews with Playwright
 _vendor/                     downloaded upstream archives (not committed)
 ```
 
+## Two variants in this repository
+
+`skins/crt-phosphor/` in this repository carries the optional interactive
+`hooks.mjs`: click either girl and she answers with a random line (the bubble is
+DOM, so it sits above her head at any text length). The Workshop submission ships
+the same skin **without** hooks, because the skin contract reserves `facets.client`
+for built-in skins and explicitly keeps it out of out-of-repo extensions.
+
+Locally, hooks need `dsh-market.provenance.json` in the installed directory; see
+`tools/make-local-provenance.mjs` and `docs/CRT-TECHNIQUE.md` (Lesson 6) for what
+that file does and does not mean.
+
 ## Verification
 
 | gate | result |

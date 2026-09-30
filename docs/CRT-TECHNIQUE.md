@@ -154,3 +154,59 @@ That needs a `hooks.mjs` facet, and the skin center only runs hooks for built-in
 skins or for market installs carrying valid `dsh-market.provenance.json` - see
 `verifyMarketProvenance` in `@linxin666/dsh-client-ui-skin-center`. Publishing the
 skin and installing it from the Workshop is therefore the path to the JS version.
+
+## Lesson 6: how the click actually works (and why the submission has no hooks)
+
+The interactive version needs JavaScript, and the skin contract's own words are:
+hooks are "a TRUSTED escape hatch, reviewed and released with this repository,
+reserved for extreme cases of built-in skins. They are not - and will not evolve
+into - the default entry for out-of-repo executable extensions". So this
+repository keeps an *optional* `hooks.mjs` for local use, and the Workshop
+submission ships without it.
+
+### The gate that has to be satisfied locally
+
+`@linxin666/dsh-client-ui-skin-center` runs a `facets.client` entry only when
+`verifyMarketProvenance(dir, id, entry)` passes (lib/index.js:869) - i.e. the skin
+directory carries `dsh-market.provenance.json` whose `version`, `source`
+(`https://dsh-market.com`), `id` and per-file sha256 match the bytes on disk.
+Built-in skins and the reviewed community skins baked into that file's table skip
+the check; a skin dropped into `$DSH_HOME/skins` does not.
+
+For development, `tools/make-local-provenance.mjs <installed-skin-dir>` writes that
+record. Be clear about what it is: it asserts market origin for a local skin, which
+is a false claim - the skin center's comment calls the file "a provenance record,
+not a capability guard against the local user", and that is exactly how it behaves.
+Keep it gitignored, and re-run the tool after every byte change to `skin.json` or
+`hooks.mjs`, because any edit invalidates the hashes and the hooks are refused
+again (the skin still renders, only the behaviour goes quiet).
+
+### What the hooks do
+
+- a `pointerdown` listener in the capture phase, registered through
+  `ctx.onCleanup` for retraction;
+- the two portrait boxes are recomputed in JS from the same constants the
+  stylesheet uses (`bottom: clamp(-30px, -2vh, -10px)`, `height:
+  clamp(340px, 62vh, 780px)` / `clamp(460px, 76vh, 1040px)`, aspect ratios
+  609/1800 and 915/1800, anchored to `[data-composer-card]`), then hit-tested;
+- the bubble is **DOM, not an asset**: a fixed-position div styled with the skin's
+  own `--dsw-font-family`, positioned with its bottom edge above the artwork box
+  (`window.innerHeight - rect.top + 10`), so it can never cover the head no matter
+  how long the line is;
+- lines rotate per girl (never the same twice in a row) and print with a
+  typewriter interval; the bubble hides after 3.6s or on the next click elsewhere.
+
+Proof the hooks really ran, independent of what is on screen:
+
+```powershell
+& $node $bin --cdp 9222 eval 'document.querySelectorAll(".crt-bubble").length'   # 2
+& $node $bin --cdp 9222 eval 'JSON.stringify([...document.querySelectorAll(".crt-bubble")].map(b=>[b.dataset.side,b.dataset.shown,b.textContent]))'
+```
+
+### Verifying locally, end to end
+
+```powershell
+robocopy <repo>\skins\crt-phosphor "$env:USERPROFILE\.dsh\skins\crt-phosphor" /E
+node tools/make-local-provenance.mjs "$env:USERPROFILE\.dsh\skins\crt-phosphor"
+# then reload the page: data-dsh-skin must be crt-phosphor and .crt-bubble must exist
+```
