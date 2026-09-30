@@ -1,0 +1,39 @@
+Phosphor CRT (磷光 CRT)
+=======================
+
+Unofficial fan artwork. Not affiliated with, endorsed by, or licensed from
+CD Projekt Red, Studio Trigger, or the creators of Cyberpunk: Edgerunners.
+
+Artwork provenance
+------------------
+
+Every raster asset in skins/crt-phosphor/assets/ originates from this project's
+own AI generations (made for its predecessor project through the OFOX image API,
+model volcengine/doubao-seedream-5.0-pro) and is processed locally:
+
+  scene-light.webp / scene-dark.webp
+      a character-free night-city scene, converted to a P1 phosphor duotone with
+      halation, baked scanlines, a vignette and grain (tools/build_crt_assets.py)
+
+  lucy-signal-left.webp / lucy-signal-right.webp
+      full-body portraits that were drawn on a flat magenta plate and keyed
+      locally (chroma-key estimation, alpha ramp, unmix, despill, despeckle)
+
+No photograph, cosplay image, or other third-party picture was sent to any
+model: the character was described in text only.
+
+Bundled typeface
+----------------
+
+  assets/fusion-pixel-12px-monospaced.woff2
+      Fusion Pixel Font, by TakWolf - OFL-1.1
+      https://github.com/TakWolf/fusion-pixel-font
+
+  assets/FUSION-PIXEL-OFL.txt
+      the font's own licence text, shipped as redistribution requires
+
+  assets/licenses/
+      the licences of the upstream fonts that Fusion Pixel composes
+      (cubic-11, ark-pixel, galmuri), each OFL or its own permissive licence
+
+Trademarks and names remain the property of their owners.

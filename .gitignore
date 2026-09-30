@@ -1,0 +1,4 @@
+_vendor/
+__pycache__/
+*.zip
+*.pyc
