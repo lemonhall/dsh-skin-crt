@@ -208,3 +208,21 @@ body {
     transition: none;
   }
 }
+
+/* --- 7. the details pane yields the space she stands in ---
+ *
+ * With the details pane open the input card's right edge sits only ~28px left of
+ * the pane, while the right portrait is about 352px wide: without help she
+ * lies across the pane's content. Measured on the live shell (viewport 1707x912):
+ * the pane host is 768px wide starting at x=939 and the pane's first card started
+ * at x=1134, i.e. under her. Insetting the pane host's left edge by her width moves
+ * that card to x=1326, clear of her 911..1263 band.
+ *
+ * The host inside the pane is the element that actually lays the content out
+ * (`[class*="_pane_"]` under `[data-rightbar-col]`); padding on the pane itself
+ * does nothing because the host is positioned against the pane's padding box.
+ */
+[class*="_frame"]:not([data-rightbar-collapsed]) [data-rightbar-col] [class*="_pane_"] {
+  padding-left: calc(clamp(460px, 76vh, 1040px) * 0.5083333 + 14px) !important;
+  box-sizing: border-box;
+}

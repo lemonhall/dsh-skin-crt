@@ -169,6 +169,9 @@ export default function defineSkinHooks() {
       }
 
       const onPointerDown = (event) => {
+        // dsh-lucy-companion owns her bubble when it is loaded: it narrates the
+        // whale-widget numbers instead of a fixed greeting, so stay quiet here.
+        if (document.documentElement.dataset.lucyNarrator === '1') return
         const x = event.clientX
         const y = event.clientY
         for (const side of ['left', 'right']) {
