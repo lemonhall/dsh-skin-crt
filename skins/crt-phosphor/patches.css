@@ -86,13 +86,19 @@ body:after {
   position: fixed;
   z-index: 900; /* above every shell surface, below the whale widget at 9999 */
   bottom: clamp(-30px, -2vh, -10px);
-  pointer-events: none;
-  background-repeat: no-repeat, no-repeat;
-  background-position: center, center bottom;
-  background-size: auto, contain;
+  /* interactive: a click on the girl pops her line (bubble layer, see below) */
+  pointer-events: auto;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
+  background-repeat: no-repeat, no-repeat, no-repeat;
+  background-position: center top 4px, center, center bottom;
+  /* layer order: bubble (hidden), glow, portrait */
+  background-size: 0 0, auto, contain;
   opacity: 1;
   filter: var(--crt-portrait-filter) drop-shadow(0 0 16px #3dff9e4d) drop-shadow(0 22px 30px #00000073);
-  transition: left 0.3s cubic-bezier(0.22, 0.78, 0.2, 1), right 0.3s cubic-bezier(0.22, 0.78, 0.2, 1), height 0.6s cubic-bezier(0.22, 0.78, 0.2, 1);
+  /* the released state is the one that waits: 2.6s of grace before the bubble goes */
+  transition: left 0.3s cubic-bezier(0.22, 0.78, 0.2, 1), right 0.3s cubic-bezier(0.22, 0.78, 0.2, 1), height 0.6s cubic-bezier(0.22, 0.78, 0.2, 1), filter 0.25s linear, background-size 0s linear 2.6s;
 }
 
 body:before {
@@ -103,6 +109,7 @@ body:before {
   aspect-ratio: 609 / 1800;
   width: auto;
   background-image:
+    url("assets/bubble-left.webp"),
     radial-gradient(58% 46% at 55% 72%, #3dff9e26, #3dff9e00 72%),
     url("assets/lucy-signal-left.webp");
 }
@@ -114,6 +121,7 @@ body:after {
   aspect-ratio: 915 / 1800;
   width: auto;
   background-image:
+    url("assets/bubble-right.webp"),
     radial-gradient(58% 46% at 45% 72%, #3dff9e26, #3dff9e00 72%),
     url("assets/lucy-signal-right.webp");
 }
@@ -181,5 +189,45 @@ body {
   body:before,
   body:after {
     display: none;
+  }
+}
+
+
+/* --- 6. the girls answer the input box ---
+ *
+ * Measured pitfalls, both silent:
+ *   1. `body::before:hover` / `::after:active` are INVALID selectors in Chromium
+ *      (a user-action pseudo-class cannot follow a pseudo-element). A selector
+ *      list containing one invalid member drops the ENTIRE rule, which killed the
+ *      valid :has() selectors below when they shared a list with it.
+ *   2. Even when such a rule is written alone, a pseudo-element never becomes the
+ *      hover/click target: the pointer lands on the originating element's box, so
+ *      the girls cannot be clicked directly from pure CSS.
+ *
+ * The composer card is a real element, so :has() on body bridges its state to the
+ * portraits. True per-girl clicks need a hooks.mjs facet, which only runs for
+ * market-installed skins.
+ */
+body:has([data-composer-card]:hover)::before,
+body:has([data-composer-card]:hover)::after,
+body:has([data-composer-card]:active)::before,
+body:has([data-composer-card]:active)::after,
+body:has([data-composer-seat]:hover)::before,
+body:has([data-composer-seat]:hover)::after {
+  background-size: 190px auto, auto, contain;
+  filter: var(--crt-portrait-filter) brightness(1.16) drop-shadow(0 0 30px #3dff9e99) drop-shadow(0 22px 30px #0000008c);
+  transition: background-size 0.08s linear, filter 0.12s linear;
+}
+
+/* the right portrait must not eat clicks aimed at the details pane */
+body:has([class*="_frame"]:not([data-rightbar-collapsed]))::after {
+  pointer-events: none;
+  cursor: default;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body:before,
+  body:after {
+    transition: none;
   }
 }

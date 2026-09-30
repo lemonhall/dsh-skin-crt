@@ -106,3 +106,51 @@ node tools/capture_facade.cjs <facade-dir> <out-dir> <id>
 `<facade>/assets/skins/<id>/` and patches `window.SKIN_MANIFEST` /
 `window.SKIN_STYLES`, which is what the market build does for published skins.
 That is how the 1440x900 previews in `skins/crt-phosphor/preview/` were made.
+
+## Lesson 5: a pseudo-element cannot be clicked, and a bad sibling kills the rule
+
+The wanted feature was "click a girl, she says something". Two hard facts came out
+of measuring it on the live page:
+
+1. **Pseudo-elements are not hover/click targets.** `body::before:hover` and
+   `body::after:active` are *invalid selectors* in Chromium (a user-action
+   pseudo-class may not follow a pseudo-element), and because a selector list
+   fails as a whole when one member is invalid, the entire rule is dropped - it
+   never reaches the CSSOM. That is how the first attempt died silently: the
+   valid `:has()` selectors shared a list with the invalid `::before:hover` ones
+   and went down with them. Proof, without any skin involvement:
+
+   ```powershell
+   # inject the rule directly and read what the browser kept
+   & $node $bin --cdp 9222 eval (Get-Content E:\development\probe-rules.js -Raw)
+   # -> the rule with "background-size: 190px" is absent from the parsed cssRules
+   ```
+
+   So: never mix `::before:hover` (or any pseudo-element plus user-action
+   pseudo-class) into a selector list, and do not expect a pseudo-element to
+   receive pointer state at all - the pointer lands on the originating element's
+   box.
+
+2. **`:has()` on the body is the bridge.** The composer card is a real element, so
+   its state can drive the portraits:
+
+   ```css
+   body:has([data-composer-card]:hover)::before,
+   body:has([data-composer-card]:hover)::after { background-size: 190px auto, auto, contain; }
+   ```
+
+   Verified live: with the pointer over the input box the computed background-size
+   of both pseudo-elements becomes `190px auto, auto, contain`, and the bubbles
+   paint above both heads.
+
+   The bubble itself is just another background layer on the same box (layer 0),
+   hidden with `background-size: 0 0` and revealed by the rule above, with a
+   `transition: background-size 0s linear 2.6s` on the *resting* state so a click
+   lingers for 2.6 seconds after the pointer leaves.
+
+Per-girl clicks (left girl answers only when the left one is hit) are impossible in
+declare-only CSS: the skin cannot add DOM, and a pseudo-element has no hit area.
+That needs a `hooks.mjs` facet, and the skin center only runs hooks for built-in
+skins or for market installs carrying valid `dsh-market.provenance.json` - see
+`verifyMarketProvenance` in `@linxin666/dsh-client-ui-skin-center`. Publishing the
+skin and installing it from the Workshop is therefore the path to the JS version.

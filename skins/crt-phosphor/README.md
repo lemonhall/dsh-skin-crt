@@ -43,6 +43,18 @@ Both are 1440x900 JPEG q85 from the market's own facade renderer.
 - No `hooks.mjs`: the market preview renderer never runs skin hooks, so the tube
   is declarative on purpose.
 
+## Talking to them
+
+Move the pointer onto the input box and both girls answer: a comic bubble pops
+above each head with a dot-matrix line, then lingers about 2.6 seconds after the
+pointer leaves.
+
+It is driven by `body:has([data-composer-card]:hover)` rather than by clicking the
+portrait, because a pseudo-element cannot be a hover or click target in Chromium
+(`body::before:hover` is not even a valid selector, and one invalid member drops
+the whole selector list). Per-girl clicks need a `hooks.mjs` facet, which the skin
+center runs only for market-installed skins.
+
 ## The portraits
 
 They anchor to `[data-composer-card]` (`left: anchor(--crt-composer left)` plus
