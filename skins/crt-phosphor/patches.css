@@ -215,14 +215,28 @@ body {
  * the pane, while the right portrait is about 352px wide: without help she
  * lies across the pane's content. Measured on the live shell (viewport 1707x912):
  * the pane host is 768px wide starting at x=939 and the pane's first card started
- * at x=1134, i.e. under her. Insetting the pane host's left edge by her width moves
- * that card to x=1326, clear of her 911..1263 band.
+ * at x=1134, i.e. under her. What is needed is only the *additional* clearance: at inset 0 the pane's own
+ * indent already puts its first card at x=1145 while her visible silhouette
+ * ends at x=1154, so ~80-90px of extra inset clears her with breathing room.
+ * (Her artwork's solid pixels occupy just 62.5% of the canvas width, so her box
+ * overstates her by a third.)
  *
  * The host inside the pane is the element that actually lays the content out
  * (`[class*="_pane_"]` under `[data-rightbar-col]`); padding on the pane itself
  * does nothing because the host is positioned against the pane's padding box.
  */
 [class*="_frame"]:not([data-rightbar-collapsed]) [data-rightbar-col] [class*="_pane_"] {
-  padding-left: calc(clamp(460px, 76vh, 1040px) * 0.5083333 + 14px) !important;
+  padding-left: clamp(24px, calc(clamp(460px, 76vh, 1040px) * 0.13), 140px) !important;
   box-sizing: border-box;
+}
+
+
+/* The in-GUI browser panel is the exception: its page surface (`<webview>`) is laid
+ * out inside the host, so the host inset already moves it, but that still leaves the
+ * page's left edge under her (measured: webview at x=1051 vs her visible edge 1132).
+ * The webview itself accepts a margin, so give it the last stretch. Nothing else in
+ * the pane is affected, which keeps the card panels from being pushed too far.
+ */
+[class*="_frame"]:not([data-rightbar-collapsed]) [data-rightbar-col] [class*="webview"] {
+  margin-left: clamp(48px, calc(clamp(460px, 76vh, 1040px) * 0.11), 118px) !important;
 }
