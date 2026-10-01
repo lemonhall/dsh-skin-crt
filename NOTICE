@@ -37,3 +37,18 @@ Bundled typeface
       (cubic-11, ark-pixel, galmuri), each OFL or its own permissive licence
 
 Trademarks and names remain the property of their owners.
+
+Rights and terms
+----------------
+
+- Depicted character: Lucy / Lucyna Kushinada, from Cyberpunk: Edgerunners.
+- Rights holders: Studio TRIGGER and CD PROJEKT RED (with their respective
+  licensors and successors).
+- Personal, non-commercial use only. Unofficial fan artwork: not affiliated with,
+  endorsed by, sponsored by, or licensed from the rights holders above, the
+  maintainers of this repository, or the DeepSeek Harness project.
+- All rights to the character and the source work remain with their rights holders;
+  if a rights holder objects, this skin should be removed.
+- The skin's own files (skin.json, skin.css, patches.css, hooks.mjs) are released
+  under CC BY-NC-SA 4.0 (see LICENSE); that grants no rights to the character or the
+  source work.
